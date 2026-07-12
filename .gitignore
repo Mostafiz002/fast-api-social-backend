@@ -1,0 +1,37 @@
+# Virtual Environment 
+venv/
+.venv/
+env/
+ENV/
+
+# Python caching mechanisms
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Environment variables and sensitive secrets
+.env
+*.env
+.secrets
+secrets.json
+
+# IDE and Editor specific configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Operating System files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local database files or logs 
+*.log
+*.db
+*.sqlite3
