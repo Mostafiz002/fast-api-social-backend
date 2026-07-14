@@ -1,9 +1,12 @@
 import time
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import Depends, FastAPI, Response, status, HTTPException
 import psycopg
 from psycopg.rows import dict_row 
 from pydantic import BaseModel 
 from pydantic_settings import BaseSettings
+from . import models
+from .database import engine, get_db
+from sqlalchemy.orm import Session
 
 class Settings(BaseSettings):
     DATABASE_URL: str
@@ -12,6 +15,8 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 settings = Settings()
+
+models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 class Post(BaseModel):
@@ -34,12 +39,15 @@ my_posts = [
 
 while True:
     try:
-        conn = psycopg.connect(conninfo=settings.DATABASE_URL, row_factory=dict_row)
+        db_url = settings.DATABASE_URL
+        if db_url.startswith("postgresql+psycopg://"):
+            db_url = db_url.replace("postgresql+psycopg://", "postgresql://", 1)
+        conn = psycopg.connect(conninfo=db_url, row_factory=dict_row)
         cursor = conn.cursor()
-        print("Database Connection is successful")
+        print("[INFO] Database Connection is successful")
         break
     except Exception as error:
-        print("Database Connection failed")
+        print("[WARN] Database Connection failed")
         print("Error", error)
         time.sleep(2)
 
@@ -51,6 +59,10 @@ def find_post(id):
 @app.get("/")
 def root():
     return {"message" : "Hello World"}
+
+@app.get("/sqlalchemy")
+def test(db: Session = Depends(get_db)):
+    return {"status" : "Success"}
 
 @app.get("/posts")
 def get_posts(response: Response):
