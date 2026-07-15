@@ -1,6 +1,8 @@
 from typing import List
 from fastapi import APIRouter, Depends, FastAPI, Response, status, HTTPException
 from pydantic_settings import BaseSettings
+
+from app import oauth2
 from .. import models, schemas
 from ..database import engine, get_db
 from sqlalchemy.orm import Session
@@ -11,7 +13,7 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[schemas.Post])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
     posts = db.query(models.Post).all()
     return posts
 
@@ -27,7 +29,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
     return post
 
 @router.post("/", status_code=201, response_model=schemas.Post)
-def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
+def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
     # cursor.execute("INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *", (post.title, post.content, post.published))
     # new_post = cursor.fetchone()
     # conn.commit()
