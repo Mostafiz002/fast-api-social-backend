@@ -5,9 +5,10 @@ from fastapi import Depends, FastAPI, Response, status, HTTPException
 import psycopg
 from psycopg.rows import dict_row 
 from pydantic_settings import BaseSettings
-from . import models, schemas
+from . import models, schemas, utils
 from .database import engine, get_db
 from sqlalchemy.orm import Session
+
 
 class Settings(BaseSettings):
     DATABASE_URL: str
@@ -96,8 +97,12 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
     
     return post
 
-@app.post("/users", status_code=201)
+# users api
+@app.post("/users", status_code=201, response_model=schemas.UserRes)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    hashed_pass = utils.hash_password(user.password)
+    user.password = hashed_pass
+
     new_user = models.User(**user.model_dump())
     db.add(new_user)
     db.commit()
