@@ -10,21 +10,24 @@ class PostBase(BaseModel):
 class PostCreate(PostBase):
     pass
 
-class Post(PostBase): 
-    id: int
-    created_at: datetime
-    class Config:
-        orm_mode = True
-class UserCreate(BaseModel):
-    email: EmailStr
-    password: str
-
 class UserRes(BaseModel):
     id: int 
     email: EmailStr
     created_at: datetime
     class Config:
         orm_mode = True
+
+class Post(PostBase): 
+    id: int
+    user_id: int
+    created_at: datetime
+    user: UserRes
+    class Config:
+        orm_mode = True
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
 
 class UserLogin(BaseModel):
     email: EmailStr
