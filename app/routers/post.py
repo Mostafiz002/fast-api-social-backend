@@ -1,10 +1,8 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, FastAPI, Response, status, HTTPException
-from pydantic_settings import BaseSettings
-
+from fastapi import APIRouter, Depends, Response, status, HTTPException
 from app import oauth2
 from .. import models, schemas
-from ..database import engine, get_db
+from ..database import get_db
 from sqlalchemy.orm import Session
 
 router = APIRouter(
